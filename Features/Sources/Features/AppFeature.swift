@@ -18,31 +18,22 @@ struct BlahkerApp: App {
 
 struct AppFeature: Reducer {
 	struct State: Equatable {
-		var isEnabledContentBlocker = false
+		var home: HomeFeature.State = .init()
 	}
 	enum Action: Equatable {
-		case scenePhaseBecomeActive
-		case checkUserEnabledContentBlocker
-		case userEnableContentBlocker(Bool)
+		case home(HomeFeature.Action)
 	}
 	
-	@Dependency(\.contentBlockerService) var contentBlockerService
+	var body: some ReducerOf<Self> {
+		Scope(state: \.home, action: /Action.home) {
+			HomeFeature()
+		}
+		Reduce(core)
+	}
 	
-	
-	func reduce(into state: inout State, action: Action) -> Effect<Action> {
+	func core(into state: inout State, action: Action) -> Effect<Action> {
 		switch action {
-		case .scenePhaseBecomeActive:
-			return .send(.checkUserEnabledContentBlocker)
-			
-		case .checkUserEnabledContentBlocker:
-			return .run { send in
-				let extensionId = "com.elaborapp.Blahker.ContentBlocker"
-				let isEnabled = await contentBlockerService.checkUserEnabledContentBlocker(extensionId)
-				await send(.userEnableContentBlocker(isEnabled))
-			}
-			
-		case .userEnableContentBlocker(let isEnabled):
-			state.isEnabledContentBlocker = isEnabled
+		case .home:
 			return .none
 		}
 	}
@@ -51,21 +42,12 @@ struct AppFeature: Reducer {
 
 struct AppView: View {
 	let store: StoreOf<AppFeature>
-	@Environment(\.scenePhase) var scenePhase
+	
 	var body: some View {
-		WithViewStore(store, observe: { $0.isEnabledContentBlocker }) { viewStore in
-			let isEnabledContentBlocker = viewStore.state
-			Text("Content Blocker is \(isEnabledContentBlocker ? "Enabled" : "Disabled")")
-				.onChange(of: scenePhase) { phase in
-					switch phase {
-					case .active:
-						store.send(.scenePhaseBecomeActive)
-					case .background, .inactive:
-						break
-					@unknown default:
-						break
-					}
-				}
-		}
+		HomeView(
+			store: store.scope(state: \.home, action: AppFeature.Action.home)
+		)
 	}
 }
+
+

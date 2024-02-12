@@ -3,11 +3,11 @@ import XCTest
 import ComposableArchitecture
 
 @MainActor
-final class AppFeatureTests: XCTestCase {
+final class HomeFeatureTests: XCTestCase {
 	func testAppLaunch_userHaventEnableContentBlocker() async throws {
 		let store = TestStore(
-			initialState: AppFeature.State(),
-			reducer: { AppFeature() }) { dep in
+			initialState: HomeFeature.State(),
+			reducer: { HomeFeature() }) { dep in
 				dep.contentBlockerService.checkUserEnabledContentBlocker = { _ in false }
 			}
 		await store.send(.scenePhaseBecomeActive)
@@ -17,8 +17,8 @@ final class AppFeatureTests: XCTestCase {
 	
 	func testAppLaunch_userAlreadyEnableContentBlocker() async throws {
 		let store = TestStore(
-			initialState: AppFeature.State(),
-			reducer: { AppFeature() }
+			initialState: HomeFeature.State(),
+			reducer: { HomeFeature() }
 		) {
 			$0.contentBlockerService.checkUserEnabledContentBlocker = { _ in true }
 		}
@@ -31,8 +31,8 @@ final class AppFeatureTests: XCTestCase {
 	
 	func testAppLaunch_userHaventEnableContentBlocker_laterEnabled() async throws {
 		let store = TestStore(
-			initialState: AppFeature.State(),
-			reducer: { AppFeature() }) { dep in
+			initialState: HomeFeature.State(),
+			reducer: { HomeFeature() }) { dep in
 				dep.contentBlockerService.checkUserEnabledContentBlocker = { _ in false }
 			}
 		await store.send(.scenePhaseBecomeActive)
