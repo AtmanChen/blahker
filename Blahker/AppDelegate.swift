@@ -11,7 +11,7 @@ import SafariServices
 
 let contentBlockerExteiosnIdentifier = "com.elaborapp.Blahker.ContentBlocker"
 
-@UIApplicationMain
+//@UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
