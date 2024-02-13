@@ -16,7 +16,8 @@ struct BlahkerApp: App {
 	}
 }
 
-struct AppFeature: Reducer {
+@Reducer
+struct AppFeature {
 	struct State: Equatable {
 		var home: HomeFeature.State = .init()
 	}
@@ -25,7 +26,7 @@ struct AppFeature: Reducer {
 	}
 	
 	var body: some ReducerOf<Self> {
-		Scope(state: \.home, action: /Action.home) {
+		Scope(state: \.home, action: \.home) {
 			HomeFeature()
 		}
 		Reduce(core)
@@ -45,7 +46,7 @@ struct AppView: View {
 	
 	var body: some View {
 		HomeView(
-			store: store.scope(state: \.home, action: AppFeature.Action.home)
+			store: store.scope(state: \.home, action: \.home)
 		)
 	}
 }

@@ -14,8 +14,8 @@ let package = Package(
 		.library(name: "ContentBlockerService", targets: ["ContentBlockerService"])
 	],
 	dependencies: [
-		.package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", exact: "1.3.0"),
-		.package(url: "https://github.com/pointfreeco/swift-dependencies.git", from: "1.0.0")
+		.package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", exact: "1.5.0"),
+		.package(url: "https://github.com/pointfreeco/swift-dependencies.git", from: "1.1.1")
 	],
 	targets: [
 		// Targets are the basic building blocks of a package, defining a module or a test suite.
