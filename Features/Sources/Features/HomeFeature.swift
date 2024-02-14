@@ -11,21 +11,46 @@ import SwiftUI
 @Reducer
 struct HomeFeature {
 	struct State: Equatable {
+		@PresentationState var alert: AlertState<Action.Alert>?
 		var isEnabledContentBlocker = false
 	}
 
 	enum Action: Equatable {
+		case alert(PresentationAction<Alert>)
 		case checkUserEnabledContentBlocker
 		case scenePhaseBecomeActive
 		case tapAboutButton 
 		case tapDontTapMeButton
 		case tapRefreshButton
 		case userEnableContentBlocker(Bool)
+		
+		enum Alert {
+			case smallDonation
+			case mediumDonation
+			case largeDonation
+			case rate5Star
+		}
 	}
 
 	@Dependency(\.contentBlockerService) var contentBlockerService
+	@Dependency(\.openURL) var openURL
+	
 	func reduce(into state: inout State, action: Action) -> Effect<Action> {
 		switch action {
+		case let .alert(.presented(alert)):
+			switch alert {
+			case .smallDonation:
+				return .none
+			case .mediumDonation:
+				return .none
+			case .largeDonation:
+				return .none
+			case .rate5Star:
+				return .run { send in
+					let url = URL(string: "https://apps.apple.com/hk/app/blahker-巴拉剋/id1182699267")!
+					await openURL(url)
+				}
+			}
 		case .scenePhaseBecomeActive:
 			return .send(.checkUserEnabledContentBlocker)
 
@@ -40,6 +65,26 @@ struct HomeFeature {
 			state.isEnabledContentBlocker = isEnabled
 			return .none
 
+		case .tapDontTapMeButton:
+			state.alert = AlertState(title: TextState("支持开发者"), message: TextState("Blahker 的维护包含不断更新挡广告清淡。如果有你的支持一定会更好"), buttons: [
+				ButtonState(action: .smallDonation, label: {
+					TextState("打赏小小费")
+				}),
+				ButtonState(action: .mediumDonation, label: {
+					TextState("打赏小费")
+				}),
+				ButtonState(action: .largeDonation, label: {
+					TextState("破费")
+				}),
+				ButtonState(action: .rate5Star, label: {
+					TextState("我不给钱，给个五星评分总行了吧")
+				}),
+				ButtonState(role: .cancel, label: {
+					TextState("算了吧，不值得")
+				})
+			])
+			return .none
+			
 		default: return .none
 		}
 	}
@@ -99,6 +144,7 @@ struct HomeView: View {
 		}
 		.foregroundStyle(.white)
 		.font(.title)
+		.alert(store: store.scope(state: \.$alert, action: \.alert))
 	}
 
 	@MainActor
